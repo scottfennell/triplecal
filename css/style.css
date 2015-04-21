@@ -1,0 +1,69 @@
+div, body {
+   margin:0px;
+   padding: 0px;
+}
+
+
+body {
+   margin:0;
+   padding:0;
+   height: 100%;
+   width: 100%;
+   background: #fafac4;
+}
+
+.year, .month, .week {
+   float: left;
+}
+
+.year {
+   width: 33%;
+   height: 100%;
+   background: #c4c4c4;
+}
+
+.year .day {
+   width: 50%;
+   height: 0.273%;
+}
+
+.year .onmonth {
+   border-left:1px solid #f00;
+}
+
+
+.day.mon { background: #abc; }
+.day.tue { background: #bcd; }
+.day.wed { background: #cde; }
+.day.thu { background: #def; }
+.day.fri { background: #fed; }
+.day.sat { background: #edc; }
+.day.sun { background: #bcd; }
+
+.month {
+   width: calc(33% - 1px);
+   height: 100%;
+   background:#d4d4d4;
+   border-left: 1px solid #000; 
+   overflow: auto;
+}
+
+.month .day {
+   height: calc(3.3333% - 1px);
+   width: 100%;
+   border-bottom: 1px solid #000;
+}
+
+.week {
+   background: #efefef;
+   width:calc(33% - 1px);
+   height: 100%;
+   border-left: 1px solid #000;
+   overflow: auto;
+}
+
+.week .day {
+   height: calc(14.285% - 1px);
+   width: 100%;
+   border-bottom: 1px solid #222;
+}

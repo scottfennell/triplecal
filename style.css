@@ -1,0 +1,32 @@
+div, body {
+   margin:0px;
+   padding: 0px;
+}
+
+
+body {
+   margin:0;
+   padding:0;
+   height: 100%;
+   width: 100%;
+   background: #fafac4;
+}
+
+.year {
+   width: 33%;
+   height: 100%;
+   background: #c4c4c4;
+}
+
+.month {
+   width: calc(33% - 1px);
+   height: 100%;
+   background:#d4d4d4;
+   border-left: 1px solid #ccc; 
+}
+
+.week {
+   width:calc(33% - 1px);
+   height: 100%;
+   border-left: 1px solid #ccc;
+}

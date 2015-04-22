@@ -1,6 +1,7 @@
 div, body {
-   margin:0px;
-   padding: 0px;
+  margin:0px;
+  padding: 0px;
+  box-sizing: border-box;
 }
 
 
@@ -12,15 +13,41 @@ body {
    background: #fafac4;
 }
 
+.backdrop {
+  position: absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:10;
+}
+
+.backdrop .yearpos {
+  width:100%;
+  height: 8.219%;
+  background: #444;
+  position:absolute;
+
+}
+
+.toplayer {
+  position: absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:20;
+}
+
 .year, .month, .week {
    float: left;
 }
 
 .year {
-   width: 33%;
+   width: 20%;
    height: 100%;
-   background: #c4c4c4;
 }
+
 
 .year .day {
    width: 50%;
@@ -41,11 +68,32 @@ body {
 .day.sun { background: #bcd; }
 
 .month {
-   width: calc(33% - 1px);
+   width: calc(40% - 1px);
    height: 100%;
    background:#d4d4d4;
-   border-left: 1px solid #000; 
+   border-left: 1px solid #000;
    overflow: auto;
+}
+
+.toplayer .month {
+  border-left: 1px solid #000;
+}
+
+.month .monthbar {
+  width: 10%;
+  float:left;
+}
+
+.monthbar .month-label {
+  width: 100%;
+  height: 100%;
+  
+}
+
+.month .days {
+  width: 90%;
+  float:left;
+  overflow:hidden;
 }
 
 .month .day {
@@ -56,7 +104,7 @@ body {
 
 .week {
    background: #efefef;
-   width:calc(33% - 1px);
+   width:calc(40% - 1px);
    height: 100%;
    border-left: 1px solid #000;
    overflow: auto;

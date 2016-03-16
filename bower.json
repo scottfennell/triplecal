@@ -1,0 +1,20 @@
+{
+  "name": "triplecal",
+  "homepage": "https://github.com/scottfennell/triplecal",
+  "authors": [
+    "Scott Fennell <scott@sinvertical.com>"
+  ],
+  "description": "A unique calendar widget",
+  "main": "",
+  "moduleType": [
+    "es6"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

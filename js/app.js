@@ -1,5 +1,7 @@
 $(document).ready(function(){
 
+  run();
+  return;
   var y = $(".toplayer .year");
   var m = $(".toplayer .month");
   var w = $(".toplayer .week");
@@ -63,4 +65,13 @@ function getDay(v) {
       console.log("Default case",s)
       return "mon";
   }
+}
+
+function run() {
+    d3.select("#yearCol").selectAll('div.day')
+    .data(d3.range(0,365))
+    .enter()
+    .append('div')
+    .attr('style','width:' + randPct() + '%')
+    .attr('class',function(day) { return 'day '+ getDay(day)})
 }

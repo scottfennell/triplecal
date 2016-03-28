@@ -68,10 +68,78 @@ function getDay(v) {
 }
 
 function run() {
-    d3.select("#yearCol").selectAll('div.day')
-    .data(d3.range(0,365))
-    .enter()
-    .append('div')
-    .attr('style','width:' + randPct() + '%')
-    .attr('class',function(day) { return 'day '+ getDay(day)})
+    var days = [];
+    var months = [
+        {name: 'Jan', ndays: 31, days:[]},
+        {name: 'Feb', ndays: 28, days:[]},
+        {name: 'Mar', ndays: 31, days:[]},
+        {name: 'Apr', ndays: 30, days:[]},
+        {name: 'May', ndays: 31, days:[]},
+        {name: 'Jun', ndays: 30, days:[]},
+        {name: 'Jul', ndays: 31, days:[]},
+        {name: 'Aug', ndays: 31, days:[]},
+        {name: 'Sep', ndays: 30, days:[]},
+        {name: 'Oct', ndays: 31, days:[]},
+        {name: 'Nov', ndays: 30, days:[]},
+        {name: 'Dec', ndays: 31, days:[]}
+    ];
+    var now = new Date();
+    var jan1 = new Date(now.getFullYear(), 1, 1);
+    var offset = jan1.getDay();
+    var dom = 1;
+    var monthIdx = 0;
+    var month = months[0];
+
+    for(var i = 0; i < 365; i++) {
+        if (dom > month.ndays) {
+            dom = 1;
+            monthIdx++;
+            month = months[monthIdx];
+        }
+
+        let day = {
+            day: i,
+            month: month,
+            dom: dom,
+            dow: (offset + i) % 7
+        };
+        month.days.push(day)
+        dom++;
+    }
+    var month = d3.select("#yearCol").selectAll('div.month')
+        .data(months)
+        .enter()
+        .append('div')
+        .attr('class', function(d) {
+            var extra = (d.ndays > 30) ? 'odd' : 'even';
+            console.log("month",d, extra)
+            return 'month ' + extra
+        })
+
+    month.append('div').attr('class','monthlabel')
+        .text(function(d) {
+            return d.name
+        })
+
+    month.selectAll('div.day').data(function(d){
+        return d.days;
+    }).enter().append('div')
+        .attr('style',function(day) { return 'width:' + (day.dow * 10) + '%' })
+        .attr('class', function(day) {
+            return 'day '+ getDay(day.dow)
+        })
+
+    var monthViewMonth = d3.select('#monthViewCol').selectAll('div.mmonth')
+        .data(months)
+        .append('div')
+        .attr('class', function(d){ return 'mmonth ' + d.ndays +'days'; });
+
+    monthViewMonth.selectAll('div.month')
+        .data(function(d) {return d.days})
+        .enter()
+        .append('div')
+        .attr('class', function(day) {
+            return 'day '+ getDay(day.dow)
+        });
+
 }

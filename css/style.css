@@ -39,25 +39,39 @@ body {
   z-index:20;
 }
 
-.year, .month, .week {
+.yearview, .monthview, .weekview {
    float: left;
 }
 
-.year {
+.yearview {
    width: 20%;
    height: 100%;
 }
 
 
-.year .day {
+.yearview .day {
    width: 50%;
    height: 0.273%;
 }
 
-.year .onmonth {
+.yearview .onmonth {
    border-left:1px solid #f00;
 }
 
+.yearview .month {
+    padding:0;
+    margin:0;
+    text-align: right;
+    position: relative;
+}
+.yearview .month .monthlabel {
+    position: absolute;
+    top:0;
+    right:0;
+}
+.yearview .month.odd {
+    background: #444;
+}
 
 .day.mon { background: #abc; }
 .day.tue { background: #bcd; }
@@ -67,7 +81,7 @@ body {
 .day.sat { background: #edc; }
 .day.sun { background: #bcd; }
 
-.month {
+.monthview {
    width: calc(40% - 1px);
    height: 100%;
    background:#d4d4d4;
@@ -79,7 +93,7 @@ body {
   border-left: 1px solid #000;
 }
 
-.month .monthbar {
+.monthview .monthbar {
   width: 10%;
   float:left;
 }
@@ -87,22 +101,22 @@ body {
 .monthbar .month-label {
   width: 100%;
   height: 100%;
-  
+
 }
 
-.month .days {
+.monthview .days {
   width: 90%;
   float:left;
   overflow:hidden;
 }
 
-.month .day {
+.monthview .day {
    height: calc(3.3333% - 1px);
    width: 100%;
    border-bottom: 1px solid #000;
 }
 
-.week {
+.weekview {
    background: #efefef;
    width:calc(40% - 1px);
    height: 100%;
@@ -110,7 +124,7 @@ body {
    overflow: auto;
 }
 
-.week .day {
+.weekview .day {
    height: calc(14.285% - 1px);
    width: 100%;
    border-bottom: 1px solid #222;

@@ -142,6 +142,16 @@ body {
    border-bottom: 1px solid rgba(0, 0, 0, 0.19);
    padding-left: 5px;
    font-size: 10px;
+   position: relative;
+}
+
+.day .event {
+    position:absolute;
+    top:0;
+    bottom:0;
+    background: #ff6767;
+    font-size: 8px;
+    overflow: hidden;
 }
 
 .monthview .d28days .day {

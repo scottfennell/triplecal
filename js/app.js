@@ -70,17 +70,17 @@ function createYearColumn(months) {
 }
 
 function createMonthColumn(months) {
-    var monthDays,
-        monthViewMonth = d3.select('#monthViewCol')
+    var monthDays;
+    var monthViewMonth = d3.select('#monthViewCol')
         .selectAll('div.month')
         .data(months)
-        .enter()
-        .append('div')
-        .attr('class', function (d) {
-            var cls = 'month d' + d.ndays + 'days';
-            cls += (d.current) ? ' current-month' : '';
-            return cls;
-        });
+        .enter().append('div')
+            .attr('class', function (d) {
+                var cls = 'month d' + d.ndays + 'days';
+                cls += (d.current) ? ' current-month' : '';
+                return cls;
+            });
+
 
     monthViewMonth.append('div')
         .attr('class', 'month-label')
@@ -88,37 +88,46 @@ function createMonthColumn(months) {
             return m.name;
         });
 
-    monthDays = monthViewMonth.append('div').attr('class', 'days');
+    var monthDaysContainer = monthViewMonth.append('div').attr('class', 'days');
 
-    monthDays.selectAll('div.month')
+    var days = monthDaysContainer.selectAll('.day')
         .data(function (d) {
             return d.days;
         })
-        .enter()
-        .append('div')
-        .attr('class', function (day) {
-            var cls = 'day ' + getDay(day.dow);
-            if (day.current) {
-                cls += ' current-day';
-            }
-            return cls;
-        })
-        .text(function (d) {
-            return d.month.name + ' - ' + d.dom + ' [' + getDay(d.dow) + ']' ;
+        .enter().append('div')
+            .attr('class', function (day) {
+                var cls = 'day ' + getDay(day.dow);
+                if (day.current) {
+                    cls += ' current-day';
+                }
+                return cls;
+            })
+            .text(function (d) {
+                return d.month.name + ' - ' + d.dom + ' [' + getDay(d.dow) + ']' ;
+            });
+
+    var daysEvents = days.selectAll('.event')
+        .data(function (d) {
+            return d.events || []
         });
 
-    monthViewMonth.selectAll('.days .day')
-        .datum(function (d) {
-            console.log("Datt", d.events);
-            return d.events || []
-        })
+    daysEvents.enter()
         .append('span')
+        .attr('class', 'event')
+        .attr('style', function(e) {
+            var start = moment(e.start.dateTime).hour();
+            var end = moment(e.end.dateTime).hour();
+            var startP = (100/24) * start;
+            var endP = 100 - ((100/24) * end);
+            return "left: " + startP + "%; " + "right:" + endP + "%";
+        })
         .text(function (e) {
             console.log("Added",e);
-            return e.map(function(ev) { return ev.summary; }).join(', ');
-        })
 
+            return e.summary
+        });
 
+    daysEvents.exit().remove();
 }
 
 function createWeekColumn(months) {

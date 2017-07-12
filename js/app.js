@@ -3,22 +3,43 @@ $(document).ready(function () {
     return;
 });
 
-
-
 function run() {
     var months = generateData();
     createYearColumn(months);
     createMonthColumn(months);
+    createWeekColumn(months);
+    addScrollListener();
+}
+
+function scrollTopTween(element, scrollTop) {
+    return function () {
+        var i = d3.interpolateNumber(element.attr('scrollTop') || 0, scrollTop);
+        return function (t) {
+            element.node().scrollTop = i(t);
+        };
+    };
 }
 
 function createYearColumn(months) {
-    var monthElements = d3.select("#yearCol").selectAll('div.month')
+    var monthElements = d3.select("#yearCol")
+        .selectAll('div.month')
         .data(months)
         .enter()
         .append('div')
         .attr('class', function (d) {
             var extra = (d.ndays > 30) ? 'odd' : 'even';
+            if (d.current) {
+                extra += ' current-month';
+            }
             return 'month ' + extra;
+        })
+        .on('click', function (d, i) {
+            var coords = d3.mouse(this);
+            var height = d3.select('#monthViewCol').node().getBoundingClientRect().height;
+            d3.select('#monthViewCol')
+                .transition()
+                .duration(200)
+                .tween('scrolltomonth', scrollTopTween(d3.select("#monthViewCol"), height * i));
         });
 
     monthElements.append('div').attr('class', 'month-label')
@@ -41,8 +62,48 @@ function createYearColumn(months) {
 }
 
 function createMonthColumn(months) {
-    var monthViewMonth = d3.select('#monthViewCol')
+    var monthDays,
+        monthViewMonth = d3.select('#monthViewCol')
         .selectAll('div.month')
+        .data(months)
+        .enter()
+        .append('div')
+        .attr('class', function (d) {
+            var cls = 'month d' + d.ndays + 'days';
+            cls += (d.current) ? ' current-month' : '';
+            return cls;
+        });
+
+    monthViewMonth.append('div')
+        .attr('class', 'month-label')
+        .text(function (m) {
+            return m.name;
+        });
+
+    monthDays = monthViewMonth.append('div').attr('class', 'days');
+    monthDays.selectAll('div.month')
+        .data(function (d) {
+            return d.days;
+        })
+        .enter()
+        .append('div')
+        .attr('class', function (day) {
+            var cls = 'day ' + getDay(day.dow);
+            if (day.current) {
+                cls += ' current-day';
+            }
+            return cls;
+        })
+        .text(function (d) {
+            return d.month.name + ' - ' + d.dom + ' [' + getDay(d.dow) + ']' ;
+        });
+
+
+}
+
+function createWeekColumn(months) {
+    var weekView = d3.select('#weekViewCol')
+        .selectAll('div.day')
         .data(months)
         .enter()
         .append('div')
@@ -50,12 +111,7 @@ function createMonthColumn(months) {
             return 'month d' + d.ndays + 'days';
         });
 
-    monthViewMonth.append('div').attr('class', 'month-label').text(function (m) {
-        return m.name;
-    });
-    var monthDays = monthViewMonth.append('div').attr('class', 'days');
-
-    monthDays.selectAll('div.month')
+    weekView.selectAll('div.month')
         .data(function (d) {
             return d.days;
         })
@@ -68,55 +124,59 @@ function createMonthColumn(months) {
             return d.month.name + ' - ' + d.dom + ' [' + getDay(d.dow) + ']' ;
         });
 
-
 }
 
 function addScrollListener() {
-    var y = $(".toplayer .year");
-    var m = $(".toplayer .month");
-    var w = $(".toplayer .week");
-    var yearpos = $(".backdrop .yearpos");
-    var mdaysHolder = m.find('.days');
-
-    var cont = "";
-    var monthDays = "";
-    var weekDays = "";
-    for (var i = 0; i < 365; i++) {
-        var mc = "month-" + Math.floor(i / 30);
-        var dc = "day-" + i;
-        var cls = "day " + getDay(i) + " " + mc + " " + dc;
-        var style = "width: " + randPct() + "%;";
-        cont += "<div class='" + cls + "' style='" + style + "'></div>";
-        monthDays += "<div class='" + cls + "'>" + mc + " " + dc + "</div>";
-        weekDays += "<div class='" + cls + "'>" + dc + "</div>";
-    }
-
-    y.html(cont);
-    mdaysHolder.html(monthDays);
-    w.html(weekDays);
-
-
-    var ydh = y.height() / 365;
-    var mdh = m.height() / 30;
-    var wdh = w.height() / 7;
-    var height = y.height();
-    var backHeight = height * 0.08129;
-    var totalMonthHeight = (mdh - 1) * 365;
+    var y = $("#yearCol"),
+        m = $("#monthViewCol"),
+        w = $("#weekViewCol"),
+        yearpos = $("#yearpos"),
+        mdh = m.height() / 30,
+        wdh = w.height() / 7,
+        height = y.height(),
+        backHeight = height * 0.08129,
+        totalMonthHeight = (mdh - 1) * 365,
+        weekScroll = null,
+        monthScroll = null;
 
     m.on('scroll', function (e) {
+        if (weekScroll !== null) return;
         var off = m.scrollTop();
         var posPct = off / (totalMonthHeight - height);
         var scaledPrct = off / mdh;
         var day = Math.floor(scaledPrct);
         var eday = day + 30;
         var mCls = ".month-" + Math.floor(day / 30);
+        if (monthScroll) {
+            clearTimeout(monthScroll);
+            monthScroll = null;
+        }
+
         y.find(".onmonth").removeClass("onmonth");
         y.find(mCls).addClass("onmonth");
         w.scrollTop(wdh * scaledPrct);
         yearpos.css({
             top: (posPct * (height - backHeight))
         });
+        monthScroll = setTimeout(function () {
+            monthScroll = null;
+        }, 50);
     });
+
+    w.on('scroll', function (e) {
+        if (monthScroll !== null) return;
+        var off = w.scrollTop();
+        var posPct = off / (((wdh - 1) * 365) - height);
+        var scaledPrct = off / wdh;
+        if (weekScroll !== null) {
+            clearTimeout(weekScrollTimeout);
+            weekScroll = null;
+        }
+        m.scrollTop(mdh * scaledPrct);
+        weekScroll = setTimeout(function () {
+            weekScroll = null;
+        }, 50);
+    })
 }
 
 function randPct() {
@@ -196,12 +256,16 @@ function generateData() {
         ndays: 31,
         days: []
     }];
+
     var now = new Date();
-    var jan1 = new Date(now.getFullYear(), 1, 1);
+    var jan1 = new Date(now.getFullYear(), 0, 1);
     var offset = jan1.getDay();
+    console.log("Offset day?", offset, jan1);
     var dom = 1;
     var monthIdx = 0;
     var month = months[0];
+    var nowmonth = now.getMonth();
+    var nowday = now.getDate();
 
     for (var i = 0; i < 365; i++) {
         if (dom > month.ndays) {
@@ -216,6 +280,13 @@ function generateData() {
             dom: dom,
             dow: (offset + i) % 7
         };
+        if (monthIdx === nowmonth) {
+            month.current = true;
+            if (dom === nowday) {
+                console.log("nowday!", dom,  month, day);
+                day.current = true;
+            }
+        }
         month.days.push(day)
         dom++;
     }

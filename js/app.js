@@ -5,9 +5,17 @@ $(document).ready(function () {
 
 function run() {
     var months = generateData();
-    createYearColumn(months);
-    createMonthColumn(months);
-    createWeekColumn(months);
+    window.months = months;
+    // createYearColumn(months);
+    // createMonthColumn(months);
+    // createWeekColumn(months);
+    //
+}
+
+function updateData() {
+    createYearColumn(window.months);
+    createMonthColumn(window.months);
+    createWeekColumn(window.months);
     addScrollListener();
 }
 
@@ -81,6 +89,7 @@ function createMonthColumn(months) {
         });
 
     monthDays = monthViewMonth.append('div').attr('class', 'days');
+
     monthDays.selectAll('div.month')
         .data(function (d) {
             return d.days;
@@ -97,6 +106,17 @@ function createMonthColumn(months) {
         .text(function (d) {
             return d.month.name + ' - ' + d.dom + ' [' + getDay(d.dow) + ']' ;
         });
+
+    monthViewMonth.selectAll('.days .day')
+        .datum(function (d) {
+            console.log("Datt", d.events);
+            return d.events || []
+        })
+        .append('span')
+        .text(function (e) {
+            console.log("Added",e);
+            return e.map(function(ev) { return ev.summary; }).join(', ');
+        })
 
 
 }

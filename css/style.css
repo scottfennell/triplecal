@@ -18,6 +18,12 @@ body {
     background: #ccc;
     padding: 1px 20px;
 }
+.header h2 {
+    float: left;
+}
+.header button {
+    float: right;
+}
 
 .toplayer {
   position: absolute;
@@ -169,4 +175,13 @@ body {
 .monthview .day.current-day {
     /*border: 1px solid #F00;*/
     background: #fd8c35;
+}
+
+.debug {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    width: 300px;
+    height: 200px;
+    background: #eee;
 }

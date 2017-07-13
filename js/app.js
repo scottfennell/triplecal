@@ -32,30 +32,32 @@ function createYearColumn(months) {
     var monthElements = d3.select("#yearCol")
         .selectAll('div.month')
         .data(months)
-        .enter()
-        .append('div')
-        .attr('class', function (d) {
-            var extra = (d.ndays > 30) ? 'odd' : 'even';
-            if (d.current) {
-                extra += ' current-month';
-            }
-            return 'month ' + extra;
-        })
-        .on('click', function (d, i) {
-            var coords = d3.mouse(this);
-            var height = d3.select('#monthViewCol').node().getBoundingClientRect().height;
-            d3.select('#monthViewCol')
-                .transition()
-                .duration(200)
-                .tween('scrolltomonth', scrollTopTween(d3.select("#monthViewCol"), height * i));
-        });
 
-    monthElements.append('div').attr('class', 'month-label')
+    //Enter
+    monthsEnter = monthElements.enter()
+            .append('div')
+            .attr('class', function (d) {
+                var extra = (d.ndays > 30) ? 'odd' : 'even';
+                if (d.current) {
+                    extra += ' current-month';
+                }
+                return 'month ' + extra;
+            })
+            .on('click', function (d, i) {
+                var coords = d3.mouse(this);
+                var height = d3.select('#monthViewCol').node().getBoundingClientRect().height;
+                d3.select('#monthViewCol')
+                    .transition()
+                    .duration(200)
+                    .tween('scrolltomonth', scrollTopTween(d3.select("#monthViewCol"), height * i));
+            });
+
+    monthsEnter.append('div').attr('class', 'month-label')
         .text(function (d) {
             return d.name;
         });
 
-    monthElements.selectAll('div.day')
+    var daySelection = monthsEnter.selectAll('div.day')
         .data(function (d) {
             return d.days;
         })
@@ -67,6 +69,7 @@ function createYearColumn(months) {
         .attr('class', function (day) {
             return 'day ' + getDay(day.dow);
         });
+
 }
 
 function createMonthColumn(months) {

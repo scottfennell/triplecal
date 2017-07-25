@@ -44,6 +44,26 @@ body {
     border: 2px solid #02f700;
 }
 
+.day {
+    cursor: pointer;
+}
+
+.day .event {
+    position:absolute;
+    top:0;
+    bottom:0;
+    background: #ff6767;
+    font-size: 8px;
+    overflow: hidden;
+}
+
+.day.mon { background: #abc; }
+.day.tue { background: #bcd; }
+.day.wed { background: #cde; }
+.day.thu { background: #def; }
+.day.fri { background: #bddee4; }
+.day.sat { background: #edc; }
+.day.sun { background: #fed; }
 
 .yearview, .monthview, .weekview {
    float: left;
@@ -56,6 +76,7 @@ body {
    overflow: hidden;
 }
 
+/* Not used */
 .yearview .day {
    width: 50%;
    height: 0.275%;
@@ -84,18 +105,12 @@ body {
 }
 
 
-.day.mon { background: #abc; }
-.day.tue { background: #bcd; }
-.day.wed { background: #cde; }
-.day.thu { background: #def; }
-.day.fri { background: #bddee4; }
-.day.sat { background: #edc; }
-.day.sun { background: #fed; }
+
 
 
 
 .toplayer .month {
-  border-left: 1px solid #000;
+  /*border-left: 1px solid #000;*/
 }
 
 
@@ -117,11 +132,11 @@ body {
    overflow: auto;
 }
 
-.monthview .month-label {
-  width: 10%;
-  height: 100%;
-  float:left;
-  padding: 5px;
+.monthview .month {
+  width: 100%;
+  /*height: 100%;*/
+  position: relative;;
+  padding: 0 0 0 5%;
   /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#4e6766+0,98cec9+100 */
   background: #4e6766; /* Old browsers */
   background: -moz-linear-gradient(top,  #4e6766 0%, #98cec9 100%); /* FF3.6-15 */
@@ -130,39 +145,52 @@ body {
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4e6766', endColorstr='#98cec9',GradientType=0 ); /* IE6-9 */
 }
 
-.monthview .days {
-  width: 90%;
-  height: 100%;
-  float:left;
-  overflow:hidden;
+.monthview .month .month-label {
+    position: absolute;
+    top: 10px;
+    left: -5px;
+    transform: rotate(-90deg);
+    font-weight: bold;
+    font-variant: small-caps;
+    font-size: 2.0em;
+    font-family: monospace;
+}
+
+.monthview .month .days {
+  width: 100%;
 }
 
 .monthview .day {
-   width: 100%;
+   width: calc(100% - 2px);
    border-bottom: 1px solid rgba(0, 0, 0, 0.19);
    padding-left: 5px;
    font-size: 10px;
    position: relative;
-}
-
-.day .event {
-    position:absolute;
-    top:0;
-    bottom:0;
-    background: #ff6767;
-    font-size: 8px;
-    overflow: hidden;
+   transition: height 0.75s;
+   margin: 0 5px 2px 0;
+   border-radius: 2px;
 }
 
 .monthview .d28days .day {
-    height: calc(3.5714% - 0px);
+    height: calc(3.5714% - 2px);
 }
+
 .monthview .d30days .day {
-    height: calc(3.3333% - 0px);
+    height: calc(3.3333% - 2px);
 }
 .monthview .d31days .day {
-    height: calc(3.2258% - 0px);
+    height: calc(3.2258% - 2px);
 }
+
+.monthview.week .d28days .day,
+.monthview.week .d30days .day,
+.monthview.week .d31days .day {
+    margin-right: 8px;
+    margin-bottom: 5px;
+    border-radius: 8px;
+    height: calc(14.285% - 4px)
+}
+
 
 /* Weekview Weekview Weekview Weekview  */
 
@@ -170,7 +198,7 @@ body {
    background: #efefef;
    width:calc(40% - 1px);
    height: 100%;
-   border-left: 1px solid #000;
+   border-left: 1px solid rgba(0,0,0,0.19);
    overflow: scroll;
 }
 
@@ -179,10 +207,12 @@ body {
    width: 100%;
    border-bottom: 1px solid rgba(0, 0, 0, 0.19);
    padding: 5px;
+   position: relative;
 }
 
 .yearview .month.current-month,
-.monthview .day.current-day {
+.monthview .day.current-day,
+.weekview .day.current-day {
     /*border: 1px solid #F00;*/
     background: #fd8c35;
 }

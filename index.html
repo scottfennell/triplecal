@@ -12,13 +12,18 @@
 <body>
     <div class='header'>
         <h2>TripleCal</h2>
+        <button id='weekToggle'>Week/Month View</button>
         <button id='authorize-button'>Auth</button>
         <button id='signout-button'>Signout</button>
     </div>
     <div class="toplayer">
-        <div id="yearpos" class="yearpos"></div>
-        <div id="yearCol" class="year yearview"></div>
-        <div id="monthViewCol" class="monthview"></div>
+
+        <div id="yearViewCol" class="year yearview">
+            <div id="yearpos" class="yearpos"></div>
+        </div>
+        <div id="monthViewCol" class="monthview">
+            <div id='monthpos'></div>
+        </div>
         <div id="weekViewCol" class="weekview"></div>
     </div>
     <pre id='content' class='debug'>

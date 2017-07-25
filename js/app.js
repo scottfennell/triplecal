@@ -6,17 +6,23 @@ $(document).ready(function () {
 function run() {
     var months = generateData();
     window.months = months;
-    // createYearColumn(months);
-    // createMonthColumn(months);
-    // createWeekColumn(months);
-    //
+    createYearColumn(months);
+    createMonthColumn(months);
+    createWeekColumn(months);
+    addClickListeners();
+    addScrollListener();
 }
 
 function updateData() {
     createYearColumn(window.months);
     createMonthColumn(window.months);
     createWeekColumn(window.months);
-    addScrollListener();
+}
+
+function addClickListeners() {
+    document.getElementById('weekToggle').onclick = function(event) {
+        document.getElementById('monthViewCol').classList.toggle('week');
+    }
 }
 
 function scrollTopTween(element, scrollTop) {
@@ -28,8 +34,61 @@ function scrollTopTween(element, scrollTop) {
     };
 }
 
+function updateColumn(element) {
+    var monthElements, monthsEnter, daySelection, daySelectionEnter;
+
+    monthElements = element
+        .selectAll('div.month')
+        .data(months)
+
+    //Enter
+    monthsEnter = monthElements.enter()
+            .append('div')
+            .attr('class', function (d) {
+                var extra = (d.ndays > 30) ? 'odd' : 'even';
+                if (d.current) {
+                    extra += ' current-month';
+                }
+                return 'month ' + extra;
+            })
+            .on('click', function (d, i) {
+                var coords = d3.mouse(this);
+            });
+
+
+    monthsEnter.append('div')
+        .attr('class', 'month-label')
+        .text(function (d) {
+            return d.name;
+        });
+
+    daySelection = monthsEnter.selectAll('div.day')
+        .data(function (d) {
+            return d.days;
+        });
+
+    daySelectionEnter = daySelection
+        .enter()
+        .append('div')
+        .attr('class', getDayClass)
+        .on('click', function (d, i) {
+            var coords = d3.mouse(this);
+            console.log("Day click")
+        });
+
+    daySelection.selectAll('.event')
+        .data(function (d) {
+            return d.events || [];
+        })
+        .enter()
+        .append('div')
+        .attr('class', getEventClass);
+}
+
 function createYearColumn(months) {
-    var monthElements = d3.select("#yearCol")
+    var monthElements, monthsEnter, daySelection, daySelectionEnter;
+
+    monthElements = d3.select("#yearCol")
         .selectAll('div.month')
         .data(months)
 
@@ -57,10 +116,12 @@ function createYearColumn(months) {
             return d.name;
         });
 
-    var daySelection = monthsEnter.selectAll('div.day')
+    daySelection = monthsEnter.selectAll('div.day')
         .data(function (d) {
             return d.days;
-        })
+        });
+
+    daySelectionEnter = daySelection
         .enter()
         .append('div')
         .attr('style', function (day) {
@@ -70,34 +131,38 @@ function createYearColumn(months) {
             return 'day ' + getDay(day.dow);
         });
 
+    daySelection.selectAll('.event').data(function (d) {
+        return d.events || [];
+    }).enter().append('div').attr('class', 'event');
+
 }
 
 function createMonthColumn(months) {
-    var monthDays;
-    var monthViewMonth = d3.select('#monthViewCol')
+    var monthDays, monthElements, monthEnter, daySelection, monthDaysElement, days, daysEvents;
+    var monthElements = d3.select('#monthViewCol')
         .selectAll('div.month')
-        .data(months)
-        .enter().append('div')
+        .data(months);
+
+    monthEnter = monthElements.enter().append('div')
             .attr('class', function (d) {
                 var cls = 'month d' + d.ndays + 'days';
                 cls += (d.current) ? ' current-month' : '';
                 return cls;
             });
 
-
-    monthViewMonth.append('div')
+    monthEnter.append('div')
         .attr('class', 'month-label')
         .text(function (m) {
             return m.name;
         });
-
-    var monthDaysContainer = monthViewMonth.append('div').attr('class', 'days');
-
-    var days = monthDaysContainer.selectAll('.day')
+    monthEnter.append('div').attr('class', 'days');
+    monthDaysElement = monthElements.select('.days')
+    days = monthDaysElement.selectAll('.day')
         .data(function (d) {
             return d.days;
         })
-        .enter().append('div')
+
+    days.enter().append('div')
             .attr('class', function (day) {
                 var cls = 'day ' + getDay(day.dow);
                 if (day.current) {
@@ -109,72 +174,86 @@ function createMonthColumn(months) {
                 return d.month.name + ' - ' + d.dom + ' [' + getDay(d.dow) + ']' ;
             });
 
-    var daysEvents = days.selectAll('.event')
-        .data(function (d) {
-            return d.events || []
-        });
-
+    daysEvents = days.selectAll('.event').data(function (d) { return d.events || []; })
     daysEvents.enter()
         .append('span')
         .attr('class', 'event')
-        .attr('style', function(e) {
+        .attr('style', function (e) {
             var start = moment(e.start.dateTime).hour();
             var end = moment(e.end.dateTime).hour();
-            var startP = (100/24) * start;
-            var endP = 100 - ((100/24) * end);
+            var startP = (100 / 24) * start;
+            var endP = 100 - ((100 / 24) * end);
             return "left: " + startP + "%; " + "right:" + endP + "%";
         })
-        .text(function (e) {
-            console.log("Added",e);
-
-            return e.summary
-        });
+        .text(function (e) { return e.summary; });
 
     daysEvents.exit().remove();
 }
 
 function createWeekColumn(months) {
-    var weekView = d3.select('#weekViewCol')
-        .selectAll('div.day')
+    var weekView, weekViewEnter, days, daysEnter;
+    weekView = d3.select('#weekViewCol')
+        .selectAll('div.month')
         .data(months)
-        .enter()
+
+    weekViewEnter = weekView.enter()
         .append('div')
         .attr('class', function (d) {
             return 'month d' + d.ndays + 'days';
         });
 
-    weekView.selectAll('div.month')
+    days = weekView.selectAll('div.day')
         .data(function (d) {
             return d.days;
-        })
+        });
+
+    daysEnter = days
         .enter()
         .append('div')
         .attr('class', function (day) {
-            return 'day ' + getDay(day.dow);
+            var cls = 'day ' + getDay(day.dow);
+            if (day.current) {
+                cls += ' current-day';
+            }
+            return cls;
         })
         .text(function (d) {
             return d.month.name + ' - ' + d.dom + ' [' + getDay(d.dow) + ']' ;
         });
 
+    daysEvents = days.selectAll('.event').data(function (d) { return d.events || []; })
+    daysEvents.enter()
+        .append('span')
+        .attr('class', 'event')
+        .attr('style', function (e) {
+            var start = moment(e.start.dateTime).hour();
+            var end = moment(e.end.dateTime).hour();
+            var startP = (100 / 24) * start;
+            var endP = 100 - ((100 / 24) * end);
+            return "left: " + startP + "%; " + "right:" + endP + "%";
+        })
+        .text(function (e) { return e.summary; });
+
 }
 
 function addScrollListener() {
     var y = $("#yearCol"),
-        m = $("#monthViewCol"),
+        m = $('#monthViewCol'),
         w = $("#weekViewCol"),
         yearpos = $("#yearpos"),
-        mdh = m.height() / 30,
+        monthWindowHeight = m.height(),
+        mdh = $("#monthViewCol .dat").first().height(),
         wdh = w.height() / 7,
         height = y.height(),
         backHeight = height * 0.08129,
-        totalMonthHeight = (mdh - 1) * 365,
+        totalMonthHeight = mdh * 365,
         weekScroll = null,
         monthScroll = null;
 
     m.on('scroll', function (e) {
         if (weekScroll !== null) return;
         var off = m.scrollTop();
-        var posPct = off / (totalMonthHeight - height);
+        var posPct = off / (totalMonthHeight - monthWindowHeight);
         var scaledPrct = off / mdh;
         var day = Math.floor(scaledPrct);
         var eday = day + 30;
@@ -201,7 +280,7 @@ function addScrollListener() {
         var posPct = off / (((wdh - 1) * 365) - height);
         var scaledPrct = off / wdh;
         if (weekScroll !== null) {
-            clearTimeout(weekScrollTimeout);
+            clearTimeout(weekScroll);
             weekScroll = null;
         }
         m.scrollTop(mdh * scaledPrct);
@@ -236,6 +315,14 @@ function getDay(v) {
             console.log("Default case", s);
             return "mon";
     }
+}
+
+function getDayClass(day) {
+    return 'day' + getDay(day);
+}
+
+function getEventClass(event) {
+    return 'event';
 }
 
 function generateData() {

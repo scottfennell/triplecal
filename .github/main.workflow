@@ -1,6 +1,6 @@
 workflow "New workflow" {
-  on = "push"
   resolves = ["GitHub Action for npm"]
+  on = "check_run"
 }
 
 action "Hello World" {
@@ -9,15 +9,6 @@ action "Hello World" {
     MY_NAME = "Mona"
   }
   args = "\"Hello world, I'm $MY_NAME!\""
-}
-
-workflow "New workflow 1" {
-  on = "push"
-  resolves = ["new-action"]
-}
-
-action "new-action" {
-  uses = "owner/repo/path@ref"
 }
 
 action "GitHub Action for npm" {
